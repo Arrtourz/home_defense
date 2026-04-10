@@ -22,6 +22,8 @@ const inspectorHeadingRange = document.getElementById("inspector-heading-range")
 const inspectorHeading = document.getElementById("inspector-heading");
 const inspectorRange = document.getElementById("inspector-range");
 const inspectorFov = document.getElementById("inspector-fov");
+const inspectorRangeField = document.getElementById("inspector-range-field");
+const inspectorFovField = document.getElementById("inspector-fov-field");
 const inspectorMirror = document.getElementById("inspector-mirror");
 const inspectorPriority = document.getElementById("inspector-priority");
 const bringToFrontButton = document.getElementById("bring-to-front");
@@ -32,7 +34,7 @@ const inspectorPreview = document.getElementById("inspector-preview");
 const inspectorNodeHealth = document.getElementById("inspector-node-health");
 
 const CLIENT_ID = `client_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-const STATIC_VERSION = "20260410a";
+const STATIC_VERSION = "20260410b";
 const LAYOUT_SAVE_DELAY_MS = 180;
 const NODE_ONLINE_MAX_AGE_MS = 1500;
 const LIDAR_ONLINE_MAX_AGE_MS = 1800;
@@ -74,6 +76,10 @@ function visibleNodeEntries() {
 
 function visibleNodes() {
   return visibleNodeEntries().map(([, node]) => node);
+}
+
+function visibleLidarNodeIds() {
+  return Object.keys(lidarState).sort();
 }
 
 function renderFloorViewsOnly() {
@@ -145,7 +151,7 @@ function isOmniSensor(radar) {
 function createRadarTemplate(floor) {
   return {
     id: `radar_${floor.id}_${Date.now()}`,
-    label: `Sensor ${floor.radars.length + 1}`,
+    label: `Radar ${floor.radars.length + 1}`,
     node_id: "",
     x_m: planWidthMeters(floor) / 2,
     y_m: planHeightMeters(floor) / 2,
@@ -154,6 +160,23 @@ function createRadarTemplate(floor) {
     range_m: 6,
     fov_deg: 120,
     color: "#1568a8",
+    priority: maxPriority(floor) + 1,
+  };
+}
+
+function createLidarTemplate(floor) {
+  return {
+    id: `lidar_${floor.id}_${Date.now()}`,
+    label: `Lidar ${floor.radars.length + 1}`,
+    node_id: "",
+    x_m: planWidthMeters(floor) / 2,
+    y_m: planHeightMeters(floor) / 2,
+    heading_deg: 0,
+    mirror_x: false,
+    range_m: 15,
+    fov_deg: 360,
+    color: "#0e8f73",
+    coverage_mode: "omni",
     priority: maxPriority(floor) + 1,
   };
 }
@@ -198,6 +221,10 @@ function isTargetVisibleForSensor(radar, target) {
   const halfFov = Number(radar.fov_deg || 0) / 2;
   const angleDeg = (Math.atan2(localX, localY) * 180) / Math.PI;
   return Math.abs(angleDeg) <= halfFov;
+}
+
+function getLidarScan(nodeId) {
+  return nodeId ? lidarState[nodeId] || null : null;
 }
 
 function globalToSensorLocal(radar, point) {
@@ -452,6 +479,39 @@ function renderInspectorHealth() {
     return;
   }
 
+  const lidarScan = getLidarScan(selection.radar.node_id);
+  if (lidarScan && !state.nodes[selection.radar.node_id]) {
+    const lidarHealth = getLidarHealth(selection.radar.node_id);
+    inspectorNodeHealth.className = "node-health-card compact";
+    inspectorNodeHealth.innerHTML = `
+      <div class="node-health-head">
+        <span class="node-health-id">${selection.radar.node_id}</span>
+        <span class="node-health-badge ${lidarHealth.online ? "online" : "offline"}">
+          ${lidarHealth.online ? "online" : "offline"}
+        </span>
+      </div>
+      <div class="node-health-grid">
+        <div class="node-health-metric">
+          <span class="node-health-label">Age</span>
+          <span class="node-health-value">${formatAge(lidarHealth.ageMs)}</span>
+        </div>
+        <div class="node-health-metric">
+          <span class="node-health-label">Points</span>
+          <span class="node-health-value">${lidarHealth.validCount}</span>
+        </div>
+        <div class="node-health-metric">
+          <span class="node-health-label">Speed</span>
+          <span class="node-health-value">${formatHz(lidarHealth.speedHz)}</span>
+        </div>
+        <div class="node-health-metric">
+          <span class="node-health-label">Rate</span>
+          <span class="node-health-value">${formatHz(lidarHealth.scanRateHz)}</span>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   const health = getNodeHealth(selection.radar.node_id);
   if (!health.present) {
     inspectorNodeHealth.className = "node-health-card compact empty";
@@ -493,7 +553,7 @@ class FloorView {
     const canvasWidth = Math.max(420, this.floor.image_width_px + 56);
     const canvasHeight = Math.max(300, this.floor.image_height_px + 56);
     this.root.innerHTML = `
-      <div class="plan-card-header">
+        <div class="plan-card-header">
         <div>
           <h2>${this.floor.title}</h2>
           <p class="plan-copy">${this.hasImage
@@ -505,7 +565,8 @@ class FloorView {
           </div>
         </div>
         <div class="floor-card-actions">
-          <button type="button" class="add-radar">Add Sensor</button>
+          <button type="button" class="add-radar">Add Radar</button>
+          <button type="button" class="add-lidar">Add Lidar</button>
         </div>
       </div>
       <div class="plan-stage">
@@ -528,6 +589,14 @@ class FloorView {
       normalizeFloorPriorities(this.floor);
       persistLayout();
       setSelection(this.floor.id, radar.id);
+    });
+
+    this.root.querySelector(".add-lidar").addEventListener("click", () => {
+      const lidar = createLidarTemplate(this.floor);
+      this.floor.radars.push(lidar);
+      normalizeFloorPriorities(this.floor);
+      persistLayout();
+      setSelection(this.floor.id, lidar.id);
     });
 
     this.canvas.addEventListener("pointerdown", (event) => {
@@ -690,14 +759,19 @@ class FloorView {
   }
 
   drawTargets() {
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
-    orderedRadars(this.floor).forEach((radar) => {
-      if (isHiddenNodeId(radar.node_id)) {
-        return;
-      }
-      const targets = radar.simulated
-        ? generateSimulatedTargets(radar)
-        : (!radar.node_id || !state.nodes[radar.node_id] ? [] : state.nodes[radar.node_id].targets);
+      this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+      orderedRadars(this.floor).forEach((radar) => {
+        if (isHiddenNodeId(radar.node_id)) {
+          return;
+        }
+        const lidarScan = getLidarScan(radar.node_id);
+        if (lidarScan) {
+          this.drawLidarScan(radar, lidarScan);
+          return;
+        }
+        const targets = radar.simulated
+          ? generateSimulatedTargets(radar)
+          : (!radar.node_id || !state.nodes[radar.node_id] ? [] : state.nodes[radar.node_id].targets);
 
       targets.forEach((target) => {
         if (!isTargetVisibleForSensor(radar, target)) {
@@ -731,8 +805,25 @@ class FloorView {
         this.overlayCtx.fill();
         this.overlayCtx.restore();
       });
-    });
-  }
+      });
+    }
+
+  drawLidarScan(radar, lidarScan) {
+      lidarScan.points.forEach((point) => {
+        if (!isTargetVisibleForSensor(radar, point)) {
+          return;
+        }
+        const mapped = this.mapTarget(radar, point);
+        const canvasPoint = this.metersToCanvas(mapped.x, mapped.y);
+        const intensity = clamp(Number(point.intensity || 0), 0, 255) / 255;
+        const hue = 220 - intensity * 160;
+        const lightness = 48 + intensity * 28;
+        this.overlayCtx.fillStyle = `hsla(${hue}deg 95% ${lightness}% / 0.92)`;
+        this.overlayCtx.beginPath();
+        this.overlayCtx.arc(canvasPoint.x, canvasPoint.y, intensity > 0.7 ? 2.6 : 1.9, 0, Math.PI * 2);
+        this.overlayCtx.fill();
+      });
+    }
 
   drawRadar(radar) {
     const center = this.metersToCanvas(radar.x_m, radar.y_m);
@@ -1032,7 +1123,10 @@ function renderWorkspace() {
 }
 
 function buildNodeOptions(selectedNodeId) {
-  const liveNodes = visibleNodeEntries().map(([nodeId]) => nodeId).sort();
+  const liveNodes = [...new Set([
+    ...visibleNodeEntries().map(([nodeId]) => nodeId),
+    ...visibleLidarNodeIds(),
+  ])].sort();
   const options = ['<option value="">Unassigned</option>'];
   liveNodes.forEach((nodeId) => {
     options.push(`<option value="${nodeId}">${nodeId}</option>`);
@@ -1083,7 +1177,9 @@ function renderInspector() {
   inspectorHeadingRange.value = String(Math.round(radar.heading_deg));
   inspectorHeading.value = String(Math.round(radar.heading_deg));
   inspectorRange.value = radar.range_m.toFixed(1);
-  inspectorFov.value = String(Math.round(radar.fov_deg));
+  inspectorRange.max = isOmniSensor(radar) ? "15" : "10";
+  inspectorFov.value = String(Math.round(isOmniSensor(radar) ? 360 : radar.fov_deg));
+  inspectorFovField.style.display = isOmniSensor(radar) ? "none" : "";
   inspectorMirror.checked = Boolean(radar.mirror_x);
   inspectorPriority.value = String(Number(radar.priority || 0));
   buildNodeOptions(radar.node_id);
@@ -1133,12 +1229,12 @@ function wireInspector() {
 
   inspectorRange.addEventListener("input", () => {
     mutateSelection((_, radar) => {
-      radar.range_m = clamp(Number(inspectorRange.value), 0.5, 10);
+      radar.range_m = clamp(Number(inspectorRange.value), 0.5, isOmniSensor(radar) ? 15 : 10);
     });
   });
   inspectorFov.addEventListener("input", () => {
     mutateSelection((_, radar) => {
-      radar.fov_deg = clamp(Number(inspectorFov.value), 1, 120);
+      radar.fov_deg = isOmniSensor(radar) ? 360 : clamp(Number(inspectorFov.value), 1, 120);
     });
   });
   inspectorMirror.addEventListener("change", () => {

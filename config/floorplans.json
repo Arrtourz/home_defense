@@ -64,24 +64,23 @@
     {
       "id": "floor_c",
       "title": "Floor C / Backyard",
-      "image_path": "/static/assets/backyard.png",
-      "image_width_px": 1630,
-      "image_height_px": 1223,
+      "image_path": "/static/assets/yard_766.png",
+      "image_width_px": 766,
+      "image_height_px": 766,
       "placeholder_text": "Backyard coverage sandbox.",
       "radars": [
         {
           "id": "sensor_floor_c_demo_1",
           "label": "360 Sensor",
-          "node_id": "",
-          "x_m": 18.587445774559615,
-          "y_m": 15.174266317597352,
-          "heading_deg": 0,
+          "node_id": "ld19_backyard__motion",
+          "x_m": 8.837809353092114,
+          "y_m": 0.5804266185030542,
+          "heading_deg": 126,
           "mirror_x": false,
-          "range_m": 12,
+          "range_m": 6.1,
           "fov_deg": 360,
           "color": "#0e8f73",
           "coverage_mode": "omni",
-          "simulated": true,
           "priority": 0
         }
       ]
