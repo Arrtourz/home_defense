@@ -94,6 +94,13 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function floorPixelsPerMeter(floor) {
+  const floorScale = Number(floor?.pixels_per_meter);
+  return Number.isFinite(floorScale) && floorScale > 0
+    ? floorScale
+    : appConfig.global_scale.pixels_per_meter;
+}
+
 function headingVectors(headingDeg) {
   const headingRad = (headingDeg * Math.PI) / 180;
   return {
@@ -110,11 +117,11 @@ function rotateVector(vector, angleRad) {
 }
 
 function planWidthMeters(floor) {
-  return floor.image_width_px / appConfig.global_scale.pixels_per_meter;
+  return floor.image_width_px / floorPixelsPerMeter(floor);
 }
 
 function planHeightMeters(floor) {
-  return floor.image_height_px / appConfig.global_scale.pixels_per_meter;
+  return floor.image_height_px / floorPixelsPerMeter(floor);
 }
 
 function normalizeFloorPriorities(floor) {
@@ -344,7 +351,7 @@ function updateStatus() {
     ? new Date(state.last_update_ms).toLocaleTimeString()
     : "-";
   freshestAgeEl.textContent = formatAge(freshest);
-  scaleLabelEl.textContent = `1m = ${appConfig.global_scale.pixels_per_meter}px`;
+  scaleLabelEl.textContent = `Default 1m = ${appConfig.global_scale.pixels_per_meter}px`;
 }
 
 function currentNodeSignature() {
@@ -674,21 +681,23 @@ class FloorView {
   }
 
   metersToCanvas(xM, yM) {
-    const { scale, offsetX, offsetY } = this.getLayout();
-    const imageX = xM * appConfig.global_scale.pixels_per_meter;
-    const imageY = this.floor.image_height_px - yM * appConfig.global_scale.pixels_per_meter;
-    return { x: offsetX + imageX * scale, y: offsetY + imageY * scale };
-  }
+      const { scale, offsetX, offsetY } = this.getLayout();
+    const pixelsPerMeter = floorPixelsPerMeter(this.floor);
+    const imageX = xM * pixelsPerMeter;
+    const imageY = this.floor.image_height_px - yM * pixelsPerMeter;
+      return { x: offsetX + imageX * scale, y: offsetY + imageY * scale };
+    }
 
-  canvasToMeters(x, y) {
-    const { scale, offsetX, offsetY } = this.getLayout();
-    const imageX = clamp((x - offsetX) / scale, 0, this.floor.image_width_px);
-    const imageY = clamp((y - offsetY) / scale, 0, this.floor.image_height_px);
-    return {
-      x: imageX / appConfig.global_scale.pixels_per_meter,
-      y: (this.floor.image_height_px - imageY) / appConfig.global_scale.pixels_per_meter,
-    };
-  }
+    canvasToMeters(x, y) {
+      const { scale, offsetX, offsetY } = this.getLayout();
+    const pixelsPerMeter = floorPixelsPerMeter(this.floor);
+      const imageX = clamp((x - offsetX) / scale, 0, this.floor.image_width_px);
+      const imageY = clamp((y - offsetY) / scale, 0, this.floor.image_height_px);
+      return {
+      x: imageX / pixelsPerMeter,
+      y: (this.floor.image_height_px - imageY) / pixelsPerMeter,
+      };
+    }
 
   mapTarget(radar, target) {
     const { forward, right } = headingVectors(radar.heading_deg);
@@ -827,9 +836,9 @@ class FloorView {
 
   drawRadar(radar) {
     const center = this.metersToCanvas(radar.x_m, radar.y_m);
-    const { forward } = headingVectors(radar.heading_deg);
-    const selected = selectedRadar.floorId === this.floor.id && selectedRadar.radarId === radar.id;
-    const radiusPx = radar.range_m * appConfig.global_scale.pixels_per_meter * this.getLayout().scale;
+      const { forward } = headingVectors(radar.heading_deg);
+      const selected = selectedRadar.floorId === this.floor.id && selectedRadar.radarId === radar.id;
+    const radiusPx = radar.range_m * floorPixelsPerMeter(this.floor) * this.getLayout().scale;
 
     this.staticCtx.save();
     this.staticCtx.fillStyle = selected ? "rgba(14, 143, 115, 0.18)" : palette.nodeCone;

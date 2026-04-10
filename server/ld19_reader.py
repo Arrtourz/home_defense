@@ -418,26 +418,6 @@ class BackgroundSubtractor:
         return foreground
 
 
-class ScanDiffDetector:
-    def __init__(self, bin_count: int = 360) -> None:
-        self.bin_count = bin_count
-        self.previous: list[float | None] = [None] * bin_count
-
-    def foreground_points(self, points: list[Point]) -> list[Point]:
-        foreground: list[Point] = []
-        current: list[float | None] = [None] * self.bin_count
-        for point in points:
-            bin_index = int(point.angle_deg) % self.bin_count
-            previous_distance = self.previous[bin_index]
-            current[bin_index] = point.distance_m
-            if previous_distance is None:
-                continue
-            if abs(point.distance_m - previous_distance) >= 0.22:
-                foreground.append(point)
-        self.previous = current
-        return foreground
-
-
 class MotionPipeline:
     def __init__(
         self,
@@ -615,28 +595,11 @@ def main() -> int:
         min_cluster_points=3,
         association_distance_m=0.95,
     )
-    baseline_pipeline = MotionPipeline(
-        detector=ScanDiffDetector(),
-        shape_gate=ShapeGatePlugin(
-            min_cluster_points=4,
-            min_cluster_width_m=0.08,
-            min_cluster_height_m=0.08,
-            min_cluster_extent_m=0.14,
-            max_aspect_ratio=6.0,
-            min_track_hits=2,
-            min_track_displacement_m=0.12,
-            min_track_speed_m_s=0.08,
-        ),
-        cluster_gap_m=0.42,
-        min_cluster_points=3,
-        association_distance_m=0.90,
-    )
 
     scan_count = 0
     print(f"[ld19] reading {args.port} @ {args.baudrate}")
     print(f"[ld19] raw scan node: {args.node_id}")
     print(f"[ld19] motion node: {args.node_id}__motion")
-    print(f"[ld19] baseline node: {args.node_id}__baseline")
 
     while True:
         packet = reader.read_packet()
@@ -651,23 +614,19 @@ def main() -> int:
         now_ms = int(completed_scan["ts_ms"])
         points = list(completed_scan["_points"])
         motion_tracks = motion_pipeline.update(points, now_ms)
-        baseline_tracks = baseline_pipeline.update(points, now_ms)
 
         raw_ok = post_scan(args.server_url, args.node_id, completed_scan)
         motion_ok = post_targets(args.server_url, f"{args.node_id}__motion", now_ms, motion_tracks)
-        baseline_ok = post_targets(args.server_url, f"{args.node_id}__baseline", now_ms, baseline_tracks)
 
         if scan_count % 10 == 0:
             print(
-                "[ld19] scans=%d valid=%d raw=%s motion=%d/%s baseline=%d/%s rate=%.2fHz"
+                "[ld19] scans=%d valid=%d raw=%s motion=%d/%s rate=%.2fHz"
                 % (
                     scan_count,
                     completed_scan["valid_count"],
                     "yes" if raw_ok else "no",
                     len(motion_tracks),
                     "yes" if motion_ok else "no",
-                    len(baseline_tracks),
-                    "yes" if baseline_ok else "no",
                     completed_scan["scan_rate_hz"],
                 )
             )
