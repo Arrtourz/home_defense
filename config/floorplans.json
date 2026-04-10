@@ -1,0 +1,90 @@
+{
+  "global_scale": {
+    "pixels_per_meter": 44,
+    "source_note": "Unified from 337px≈25ft and 341px≈25.6ft"
+  },
+  "floors": [
+    {
+      "id": "floor_a",
+      "title": "Floor A",
+      "image_path": "/static/assets/floorplan_a.jpg",
+      "image_width_px": 341,
+      "image_height_px": 828,
+      "radars": [
+        {
+          "id": "radar_floor_a_1775421601002",
+          "label": "Sensor 2",
+          "node_id": "esp32_room_b",
+          "x_m": 5.526624847855711,
+          "y_m": 8.272705486866029,
+          "heading_deg": 0,
+          "mirror_x": false,
+          "range_m": 6.5,
+          "fov_deg": 120,
+          "color": "#1568a8",
+          "priority": 0
+        },
+        {
+          "id": "radar_floor_a_1775498199813",
+          "label": "Sensor 3",
+          "node_id": "esp32_room_c",
+          "x_m": 0.08073990195127963,
+          "y_m": 14.256915219187228,
+          "heading_deg": 116.25049788747887,
+          "mirror_x": false,
+          "range_m": 6,
+          "fov_deg": 120,
+          "color": "#1568a8",
+          "priority": 1
+        }
+      ]
+    },
+    {
+      "id": "floor_b",
+      "title": "Floor B",
+      "image_path": "/static/assets/floorplan_b.jpg",
+      "image_width_px": 337,
+      "image_height_px": 614,
+      "radars": [
+        {
+          "id": "radar_b_1",
+          "label": "Sensor1",
+          "node_id": "esp32_bedroom",
+          "x_m": 7.621892371908141,
+          "y_m": 13.900752865290922,
+          "heading_deg": 211.59060490040233,
+          "mirror_x": true,
+          "range_m": 6,
+          "fov_deg": 120,
+          "color": "#1568a8",
+          "priority": 0
+        }
+      ]
+    },
+    {
+      "id": "floor_c",
+      "title": "Floor C / Backyard",
+      "image_path": "/static/assets/backyard.png",
+      "image_width_px": 1630,
+      "image_height_px": 1223,
+      "placeholder_text": "Backyard coverage sandbox.",
+      "radars": [
+        {
+          "id": "sensor_floor_c_demo_1",
+          "label": "360 Sensor",
+          "node_id": "",
+          "x_m": 18.587445774559615,
+          "y_m": 15.174266317597352,
+          "heading_deg": 0,
+          "mirror_x": false,
+          "range_m": 12,
+          "fov_deg": 360,
+          "color": "#0e8f73",
+          "coverage_mode": "omni",
+          "simulated": true,
+          "priority": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LD2450 Multi-Floor Sensor Workspace</title>
+    <link rel="stylesheet" href="/static/style.css?v=20260410a" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Phase 2</p>
+          <h1>Multi-Floor Sensor Workspace</h1>
+          <p class="subtitle">
+            Configure sensor overlays across multiple floorplans, bind them to live
+            ESP32 nodes, and tune position and heading directly on the map before
+            switching the hardware to Wi-Fi transport.
+          </p>
+        </div>
+        <div class="status-panel">
+          <div class="status-line"><span class="label">Server</span><span id="server-status">Connecting</span></div>
+          <div class="status-line"><span class="label">Last Update</span><span id="last-update">-</span></div>
+          <div class="status-line"><span class="label">Nodes</span><span id="node-count">0</span></div>
+          <div class="status-line"><span class="label">Online</span><span id="online-count">0</span></div>
+          <div class="status-line"><span class="label">Targets</span><span id="target-count">0</span></div>
+          <div class="status-line"><span class="label">Freshest Age</span><span id="freshest-age">-</span></div>
+          <div class="status-line"><span class="label">Scale</span><span id="scale-label">-</span></div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <section class="stage-shell">
+          <div class="toolbar">
+            <div>
+              <p class="toolbar-label">Overview</p>
+              <p class="toolbar-copy">All floors and outdoor areas stay visible on the main page.</p>
+            </div>
+            <div class="toolbar-actions">
+              <button id="export-layout" type="button">Export Layout</button>
+              <button id="clear-selection" type="button">Clear Selection</button>
+            </div>
+          </div>
+          <div id="floorplan-grid" class="floorplan-grid"></div>
+        </section>
+
+        <aside class="inspector">
+          <div class="inspector-head">
+            <p class="toolbar-label">Selected Sensor</p>
+            <h2 id="inspector-title">None Selected</h2>
+            <p id="inspector-subtitle" class="inspector-copy">Click a sensor on any floor to edit it.</p>
+            <div class="inspector-head-actions">
+              <button id="bring-to-front" type="button">Bring To Front</button>
+              <button id="send-to-back" type="button">Send To Back</button>
+              <button id="duplicate-radar" type="button">Duplicate</button>
+              <button id="remove-radar" type="button">Remove</button>
+            </div>
+          </div>
+
+          <div class="inspector-group">
+            <label class="field">
+              <span>Label</span>
+              <input id="inspector-label" type="text" />
+            </label>
+            <label class="field">
+              <span>Assigned Device</span>
+              <select id="inspector-node"></select>
+            </label>
+            <div id="inspector-node-health" class="node-health-card compact empty">
+              No device assigned.
+            </div>
+          </div>
+
+          <div class="inspector-group two-col">
+            <label class="field">
+              <span>X (m)</span>
+              <input id="inspector-x" type="number" step="0.01" />
+            </label>
+            <label class="field">
+              <span>Y (m)</span>
+              <input id="inspector-y" type="number" step="0.01" />
+            </label>
+          </div>
+
+          <div class="inspector-group">
+            <label class="field">
+              <span>Layer Priority</span>
+              <input id="inspector-priority" type="number" step="1" readonly />
+            </label>
+          </div>
+
+          <div class="inspector-group">
+            <label class="field">
+              <span>Heading (deg)</span>
+              <input id="inspector-heading-range" type="range" min="0" max="359" step="1" />
+              <input id="inspector-heading" type="number" min="0" max="359" step="1" />
+            </label>
+          </div>
+
+          <div class="inspector-group two-col">
+            <label class="field">
+              <span>Range (m)</span>
+              <input id="inspector-range" type="number" min="0.5" max="10" step="0.1" />
+            </label>
+            <label class="field">
+              <span>Display Angle (deg)</span>
+              <input id="inspector-fov" type="number" min="1" max="120" step="1" />
+            </label>
+          </div>
+
+          <label class="checkbox-row">
+            <input id="inspector-mirror" type="checkbox" />
+            <span>Mirror sensor X axis</span>
+          </label>
+
+          <pre id="inspector-preview" class="config-preview"></pre>
+        </aside>
+      </section>
+
+      <section class="legend-panel">
+        <div><span class="swatch node"></span><span>Sensor body, range outline, and heading handle</span></div>
+        <div><span class="swatch target"></span><span>Realtime target stream mapped from assigned device or demo source</span></div>
+      </section>
+
+      <section class="lidar-panel">
+        <div class="lidar-panel-head">
+          <div>
+            <p class="toolbar-label">LD19 Viewer</p>
+            <h2>Point Cloud</h2>
+            <p class="toolbar-copy">
+              Raw LD19 scan data rendered in a viewer-style polar plot. This path is
+              independent from the ESP32 target sensors and reads directly from the
+              LiDAR USB adapter on the PC.
+            </p>
+          </div>
+        </div>
+        <div id="lidar-viewer-list" class="lidar-viewer-list"></div>
+      </section>
+
+      <section class="device-panel">
+        <div class="device-panel-head">
+          <p class="toolbar-label">Node Health</p>
+          <h2>Live Devices</h2>
+        </div>
+        <div id="node-health-list" class="node-health-list"></div>
+      </section>
+    </main>
+
+    <script src="/static/app.js?v=20260410a"></script>
+  </body>
+</html>

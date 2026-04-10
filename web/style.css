@@ -1,0 +1,554 @@
+:root {
+  --panel: rgba(255, 251, 244, 0.92);
+  --text: #14231d;
+  --muted: #5d7268;
+  --accent-soft: rgba(14, 143, 115, 0.14);
+  --node: #1b6ca8;
+  --target: #eb4f37;
+  --border: rgba(20, 35, 29, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", "PingFang SC", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, #fffef9 0%, transparent 28%),
+    linear-gradient(160deg, #dfe7d7 0%, #f4efe6 48%, #d9e7e4 100%);
+}
+
+.app-shell {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.02;
+}
+
+.subtitle {
+  max-width: 780px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.status-panel,
+.stage-shell,
+.plan-card,
+.lidar-panel,
+.legend-panel,
+.device-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(44, 66, 57, 0.09);
+  backdrop-filter: blur(8px);
+}
+
+.status-panel { padding: 18px 20px; }
+
+.status-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(20, 35, 29, 0.08);
+}
+
+.status-line:last-child { border-bottom: 0; }
+.label { color: var(--muted); }
+
+.workspace {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.9fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.stage-shell { padding: 16px; }
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.toolbar-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.toolbar-label {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.toolbar-actions,
+.floor-card-actions,
+.inspector-head-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-actions button,
+.floor-card-actions button,
+.inspector-head-actions button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.toolbar-actions button:hover,
+.floor-card-actions button:hover,
+.inspector-head-actions button:hover {
+  background: rgba(14, 143, 115, 0.24);
+}
+
+.inspector-head-actions button {
+  background: linear-gradient(180deg, #1ea47f 0%, #0e8f73 100%);
+  color: #f4fff9;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(14, 143, 115, 0.28);
+}
+
+.inspector-head-actions button:hover {
+  background: linear-gradient(180deg, #27b48d 0%, #13a182 100%);
+}
+
+.inspector-head-actions button:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(230, 243, 237, 0.38);
+  box-shadow: none;
+}
+
+.floorplan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.plan-card { padding: 16px; }
+
+.plan-card-wide {
+  grid-column: 1 / -1;
+}
+
+.plan-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.plan-card h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+
+.plan-copy,
+.floor-card-meta {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.floor-card-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.plan-stage {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.plan-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 248, 244, 0.9));
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.plan-static-canvas {
+  position: relative;
+  z-index: 0;
+}
+
+.plan-overlay-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+}
+
+.inspector {
+  background: rgba(20, 35, 29, 0.92);
+  color: #e6f3ed;
+  border-radius: 24px;
+  padding: 20px;
+  position: sticky;
+  top: 16px;
+}
+
+.inspector-head h2 {
+  margin: 4px 0 6px;
+  font-size: 28px;
+  line-height: 1.05;
+}
+
+.inspector-copy {
+  margin: 0;
+  color: rgba(230, 243, 237, 0.72);
+  line-height: 1.5;
+}
+
+.inspector-head-actions {
+  margin-top: 16px;
+}
+
+.inspector-group {
+  margin-top: 18px;
+}
+
+.inspector-group.two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.field span {
+  color: rgba(230, 243, 237, 0.76);
+  font-size: 14px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+}
+
+.field input[type="number"],
+.field input[type="text"],
+.field select {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(230, 243, 237, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #eff7f2;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 18px;
+  color: rgba(230, 243, 237, 0.76);
+}
+
+.config-preview {
+  margin: 14px 0 0;
+  padding: 14px;
+  min-height: 220px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #d8fff1;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.node-health-card {
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(20, 35, 29, 0.1);
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.node-health-card.compact {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(230, 243, 237, 0.14);
+}
+
+.node-health-card.empty {
+  color: var(--muted);
+}
+
+.node-health-card.compact.empty {
+  color: rgba(230, 243, 237, 0.68);
+}
+
+.node-health-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.node-health-id {
+  font-weight: 600;
+}
+
+.node-health-badge {
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.node-health-badge.online {
+  background: rgba(14, 143, 115, 0.14);
+  color: #0e8f73;
+}
+
+.node-health-badge.offline {
+  background: rgba(235, 79, 55, 0.12);
+  color: #c54b38;
+}
+
+.node-health-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.node-health-metric {
+  display: grid;
+  gap: 2px;
+}
+
+.node-health-label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.node-health-card.compact .node-health-label,
+.node-health-card.compact .node-health-value {
+  color: #eff7f2;
+}
+
+.node-health-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.legend-panel {
+  margin-top: 16px;
+  padding: 14px 18px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.legend-panel div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.lidar-panel {
+  margin-top: 16px;
+  padding: 16px 18px;
+}
+
+.lidar-panel-head h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.lidar-viewer-list {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 14px;
+}
+
+.lidar-empty {
+  padding: 22px;
+  border-radius: 18px;
+  background: rgba(20, 35, 29, 0.05);
+  color: var(--muted);
+  border: 1px dashed rgba(20, 35, 29, 0.16);
+}
+
+.lidar-card {
+  border-radius: 20px;
+  overflow: hidden;
+  background: #050708;
+  color: #ebfff5;
+  border: 1px solid rgba(97, 255, 181, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 22px 44px rgba(5, 10, 8, 0.28);
+}
+
+.lidar-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(97, 255, 181, 0.08);
+}
+
+.lidar-card-head h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.lidar-card-copy {
+  margin: 0;
+  color: rgba(210, 255, 228, 0.62);
+  font-size: 13px;
+}
+
+.lidar-badge {
+  align-self: start;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lidar-badge.online {
+  background: rgba(89, 255, 182, 0.14);
+  color: #57ffb5;
+}
+
+.lidar-badge.offline {
+  background: rgba(255, 120, 120, 0.14);
+  color: #ff8b8b;
+}
+
+.lidar-card-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px 16px 0;
+}
+
+.lidar-metric {
+  display: grid;
+  gap: 2px;
+}
+
+.lidar-metric-label {
+  color: rgba(210, 255, 228, 0.56);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lidar-metric-value {
+  color: #59ffb6;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.lidar-canvas-shell {
+  padding: 14px 16px 18px;
+}
+
+.lidar-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+  background: radial-gradient(circle at center, rgba(19, 31, 28, 0.98) 0%, #030506 68%, #020304 100%);
+}
+
+.lidar-pipeline-meta {
+  padding-top: 0;
+  padding-bottom: 18px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.swatch.node { background: var(--node); }
+.swatch.target { background: var(--target); }
+
+.device-panel {
+  margin-top: 16px;
+  padding: 16px 18px;
+}
+
+.device-panel-head h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.node-health-list {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .app-shell { padding: 18px; }
+  .hero { grid-template-columns: 1fr; }
+  .workspace { grid-template-columns: 1fr; }
+  .floorplan-grid { grid-template-columns: 1fr; }
+  .inspector { position: static; }
+  .inspector-group.two-col { grid-template-columns: 1fr; }
+  .node-health-grid { grid-template-columns: 1fr; }
+  .lidar-card-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  h1 { font-size: 34px; }
+}

@@ -1,0 +1,26 @@
+{
+  "floorplan": {
+    "image_path": "/static/assets/floorplan.jpg",
+    "image_width_px": 341,
+    "image_height_px": 828,
+    "pixels_per_meter": 44
+  },
+  "room": {
+    "id": "right_upper_bedroom",
+    "name": "Right Upper Bedroom",
+    "label": "Bedroom 13'1\" x 10'8\"",
+    "width_m": 3.988,
+    "height_m": 3.251,
+    "left_px": 159,
+    "top_px": 0,
+    "width_px": 176,
+    "height_px": 143
+  },
+  "radar": {
+    "node_id": "demo_node",
+    "x_m": 0.45,
+    "y_m": 0.25,
+    "heading_deg": 0,
+    "mirror_x": false
+  }
+}
