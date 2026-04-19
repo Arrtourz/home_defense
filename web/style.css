@@ -270,9 +270,27 @@ h1 {
   font-size: 14px;
 }
 
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.field-label-row output {
+  color: #8ff0cf;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 .field input,
 .field select {
   width: 100%;
+}
+
+.field input[type="range"] {
+  accent-color: #22c995;
+  cursor: pointer;
 }
 
 .field input[type="number"],

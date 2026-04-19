@@ -12,6 +12,32 @@
       "image_height_px": 828,
       "radars": [
         {
+          "id": "radar_floor_a_1775498199813",
+          "label": "Sensor 3",
+          "node_id": "esp32_room_c",
+          "x_m": 0.06490981012199563,
+          "y_m": 14.288577221412238,
+          "heading_deg": 112.96404883135028,
+          "mirror_x": false,
+          "range_m": 6.5,
+          "fov_deg": 89,
+          "color": "#1568a8",
+          "priority": 0
+        },
+        {
+          "id": "radar_floor_a_1776493175846",
+          "label": "Radar 3",
+          "node_id": "esp32_room_d",
+          "x_m": 0,
+          "y_m": 8.63202365078216,
+          "heading_deg": 90,
+          "mirror_x": false,
+          "range_m": 5,
+          "fov_deg": 120,
+          "color": "#1568a8",
+          "priority": 1
+        },
+        {
           "id": "radar_floor_a_1775421601002",
           "label": "Sensor 2",
           "node_id": "esp32_room_b",
@@ -19,23 +45,10 @@
           "y_m": 8.272705486866029,
           "heading_deg": 0,
           "mirror_x": false,
-          "range_m": 6.5,
+          "range_m": 3,
           "fov_deg": 120,
           "color": "#1568a8",
-          "priority": 0
-        },
-        {
-          "id": "radar_floor_a_1775498199813",
-          "label": "Sensor 3",
-          "node_id": "esp32_room_c",
-          "x_m": 0.08073990195127963,
-          "y_m": 14.256915219187228,
-          "heading_deg": 116.25049788747887,
-          "mirror_x": false,
-          "range_m": 6,
-          "fov_deg": 120,
-          "color": "#1568a8",
-          "priority": 1
+          "priority": 2
         }
       ]
     },
@@ -50,11 +63,11 @@
           "id": "radar_b_1",
           "label": "Sensor1",
           "node_id": "esp32_bedroom",
-          "x_m": 5.152360913090249,
-          "y_m": 13.873940898679193,
-          "heading_deg": 179.10488523046774,
+          "x_m": 5.136609663426402,
+          "y_m": 13.716417983549805,
+          "heading_deg": 180,
           "mirror_x": false,
-          "range_m": 6,
+          "range_m": 4.7,
           "fov_deg": 120,
           "color": "#1568a8",
           "priority": 0
@@ -73,10 +86,10 @@
         {
           "id": "sensor_floor_c_demo_1",
           "label": "360 Sensor",
-          "node_id": "ld19_backyard",
-          "x_m": 15.807463883579391,
-          "y_m": 1.038162922325722,
-          "heading_deg": 12,
+          "node_id": "ld19_backyard_pc2",
+          "x_m": 14.85534077872848,
+          "y_m": 8.292006353538762,
+          "heading_deg": 172,
           "mirror_x": false,
           "range_m": 12,
           "fov_deg": 360,

@@ -22,6 +22,8 @@ const inspectorHeadingRange = document.getElementById("inspector-heading-range")
 const inspectorHeading = document.getElementById("inspector-heading");
 const inspectorRange = document.getElementById("inspector-range");
 const inspectorFov = document.getElementById("inspector-fov");
+const inspectorRangeValue = document.getElementById("inspector-range-value");
+const inspectorFovValue = document.getElementById("inspector-fov-value");
 const inspectorRangeField = document.getElementById("inspector-range-field");
 const inspectorFovField = document.getElementById("inspector-fov-field");
 const inspectorMirror = document.getElementById("inspector-mirror");
@@ -34,7 +36,7 @@ const inspectorPreview = document.getElementById("inspector-preview");
 const inspectorNodeHealth = document.getElementById("inspector-node-health");
 
 const CLIENT_ID = `client_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-const STATIC_VERSION = "20260410b";
+const STATIC_VERSION = "20260418a";
 const LAYOUT_SAVE_DELAY_MS = 180;
 const NODE_ONLINE_MAX_AGE_MS = 1500;
 const LIDAR_ONLINE_MAX_AGE_MS = 1800;
@@ -1187,7 +1189,9 @@ function renderInspector() {
   inspectorHeading.value = String(Math.round(radar.heading_deg));
   inspectorRange.value = radar.range_m.toFixed(1);
   inspectorRange.max = isOmniSensor(radar) ? "15" : "10";
+  inspectorRangeValue.textContent = `${Number(radar.range_m || 0).toFixed(1)}m`;
   inspectorFov.value = String(Math.round(isOmniSensor(radar) ? 360 : radar.fov_deg));
+  inspectorFovValue.textContent = `${Math.round(isOmniSensor(radar) ? 360 : radar.fov_deg)}°`;
   inspectorFovField.style.display = isOmniSensor(radar) ? "none" : "";
   inspectorMirror.checked = Boolean(radar.mirror_x);
   inspectorPriority.value = String(Number(radar.priority || 0));

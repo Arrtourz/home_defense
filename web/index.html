@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LD2450 Multi-Floor Sensor Workspace</title>
-    <link rel="stylesheet" href="/static/style.css?v=20260410b" />
+    <link rel="stylesheet" href="/static/style.css?v=20260418a" />
   </head>
   <body>
     <main class="app-shell">
@@ -99,12 +99,18 @@
 
           <div class="inspector-group two-col">
             <label id="inspector-range-field" class="field">
-              <span>Range (m)</span>
-              <input id="inspector-range" type="number" min="0.5" max="10" step="0.1" />
+              <span class="field-label-row">
+                <span>Range (m)</span>
+                <output id="inspector-range-value">-</output>
+              </span>
+              <input id="inspector-range" type="range" min="0.5" max="10" step="0.1" />
             </label>
             <label id="inspector-fov-field" class="field">
-              <span>Display Angle (deg)</span>
-              <input id="inspector-fov" type="number" min="1" max="120" step="1" />
+              <span class="field-label-row">
+                <span>Display Angle (deg)</span>
+                <output id="inspector-fov-value">-</output>
+              </span>
+              <input id="inspector-fov" type="range" min="1" max="120" step="1" />
             </label>
           </div>
 
@@ -146,6 +152,6 @@
       </section>
     </main>
 
-    <script src="/static/app.js?v=20260410b"></script>
+    <script src="/static/app.js?v=20260418a"></script>
   </body>
 </html>
